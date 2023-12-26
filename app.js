@@ -3,7 +3,10 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 const doctorsRoutes = require('./routes/doctors-routes');
-const HttpError = require('./models/http-error')
+const specialitiesRoutes = require('./routes/specialities-routes');
+const appointmentRoutes = require('./routes/appointments-routes');
+const usersRoutes = require('./routes/users-routes');
+const HttpError = require('./models/http-error');
 
 const app = express();
 
@@ -11,6 +14,9 @@ const app = express();
 app.use(bodyParser.json());
 
 app.use('/api/doctors', doctorsRoutes);
+app.use('/api/specialities', specialitiesRoutes);
+app.use('/api/appointments', appointmentRoutes);
+app.use('/api/users', usersRoutes);
 
 app.use((req, res, next) => {
     return next(
