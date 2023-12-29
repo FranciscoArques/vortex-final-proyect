@@ -1,22 +1,26 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const mongoose = require('mongoose');
+require('dotenv').config();
 
+const usersRoutes = require('./routes/users-routes');
 const doctorsRoutes = require('./routes/doctors-routes');
 const specialitiesRoutes = require('./routes/specialities-routes');
 const appointmentRoutes = require('./routes/appointments-routes');
-const usersRoutes = require('./routes/users-routes');
 const HttpError = require('./models/http-error');
 
 const app = express();
 
+app.use(cors());
+
 //used for POST Request
 app.use(bodyParser.json());
 
+app.use('/api/users', usersRoutes);
 app.use('/api/doctors', doctorsRoutes);
 app.use('/api/specialities', specialitiesRoutes);
 app.use('/api/appointments', appointmentRoutes);
-app.use('/api/users', usersRoutes);
 
 app.use((req, res, next) => {
     return next(
@@ -34,10 +38,13 @@ app.use((error, req, res, next) => {
 })
 
 mongoose
-    .connect('mongodb+srv://fran:sQXpfhfBzWE2NtIG@clustervortex.6inedbo.mongodb.net/medical-related?retryWrites=true&w=majority')
+    .connect(process.env.MONGODB_URI)
     .then(() => {
-        app.listen(5000);
+        app.listen(process.env.PORT);
     })
     .catch(err => {
-        console.log(err);
+        return next(
+            new HttpError('Something went wrong with mongoose connection.', 500),
+            err
+        )
     });

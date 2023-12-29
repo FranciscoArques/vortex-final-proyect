@@ -1,15 +1,24 @@
 const express = require('express');
 const { check } = require('express-validator');
 const appointmentsControllers = require('../controllers/appointments-controllers');
-const roleMiddleware = require('../models/role-middleware');
+const authMiddleware = require('../middleware/auth-middleware');
+const roleMiddleware = require('../middleware/role-middleware');
+const paginationMiddleware = require('../middleware/pagination-middleware');
 const router = express.Router();
 
+//show patient's appointment
+router.get('/patient/:userId', authMiddleware.authenticateUser, paginationMiddleware.handlePagination, appointmentsControllers.showPatientsAppointment);
+
+//show patient's canceled appointment
+router.get('/canceled/:userId', authMiddleware.authenticateUser, paginationMiddleware.handlePagination, appointmentsControllers.showPatientsCanceledAppointment);
+
 //show doctor's appointment
-router.get('/:id', roleMiddleware.checkAdminRole, appointmentsControllers.showDoctorAppointments);
+router.get('/:id', authMiddleware.authenticateUser, roleMiddleware.checkAdminRole, paginationMiddleware.handlePagination, appointmentsControllers.showDoctorAppointments);
 
 //create appointment
 router.post(
     '/',
+    authMiddleware.authenticateUser,
     roleMiddleware.checkAdminRole,
     [
         check('time.minutes').isIn(['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55']).withMessage('A reasonable minute must be added.'),
@@ -26,6 +35,7 @@ router.post(
 //update appointment
 router.patch(
     '/:id',
+    authMiddleware.authenticateUser,
     roleMiddleware.checkAdminRole,
     [
         check('time.minutes').optional().isIn(['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55']).withMessage('A reasonable minute must be added.'),
@@ -42,6 +52,7 @@ router.patch(
 //arrange appointment
 router.patch(
     '/setTaken/:id',
+    authMiddleware.authenticateUser,
     roleMiddleware.checkPatientRole,
     appointmentsControllers.arrangeAppointment
 );
@@ -49,11 +60,12 @@ router.patch(
 //disarrange appointment
 router.patch(
     '/setAvailable/:id',
+    authMiddleware.authenticateUser,
     roleMiddleware.checkPatientRole,
     appointmentsControllers.disarrangeAppointment
 );
 
 //delete appointment
-router.delete('/:id', roleMiddleware.checkAdminRole, appointmentsControllers.deleteAppointmentById);
+router.delete('/:id', authMiddleware.authenticateUser, roleMiddleware.checkAdminRole, appointmentsControllers.deleteAppointmentById);
 
 module.exports = router;

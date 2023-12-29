@@ -1,19 +1,22 @@
 const express = require('express');
 const { check } = require('express-validator');
 const doctorsControllers = require('../controllers/doctors-controllers');
-const roleMiddleware = require('../models/role-middleware');
+const authMiddleware = require('../middleware/auth-middleware');
+const roleMiddleware = require('../middleware/role-middleware');
+const paginationMiddleware = require('../middleware/pagination-middleware');
 const router = express.Router();
 
 //show all doctors
-router.get('/', doctorsControllers.showAllDoctorsData);
+router.get('/', paginationMiddleware.handlePagination, doctorsControllers.showAllDoctorsData);
 
 //get doctor by id
-router.get('/:id', doctorsControllers.getDoctorbyId);
+router.get('/:id', paginationMiddleware.handlePagination, doctorsControllers.getDoctorbyId);
 
 //create doctor
 //quick side note: /^[a-zA-Z\u00C0-\u017F\u00FC\s']+$/ allows letters, accented characters, "ü", spaces, and single quotes. No other special characters allowed.
 router.post(
     '/',
+    authMiddleware.authenticateUser,
     roleMiddleware.checkAdminRole,
     [
         check('surname').notEmpty().withMessage('A Surname is required.').matches(/^[a-zA-Z\u00C0-\u017F\u00FC\s']+$/).withMessage('No special characters allowed in Surname.'),
@@ -28,6 +31,7 @@ router.post(
 //update doctor
 router.patch(
     '/:id',
+    authMiddleware.authenticateUser,
     roleMiddleware.checkAdminRole,
     [
         check('surname').optional().notEmpty().withMessage('A Surname is required.').matches(/^[a-zA-Z\u00C0-\u017F\u00FC\s']+$/).withMessage('No special characters allowed in Surname.'),

@@ -2,18 +2,27 @@ const User = require('../models/user');
 const HttpError = require('../models/http-error');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const { validationResult } = require('express-validator');
+require('dotenv').config();
 
-//Load the secret key from environment variables
 const jwtSecretKey = process.env.JWT_SECRET_KEY || 'defaultSecretKey';
 
 const registerUser = async (req, res, next) => {
+    const error = validationResult(req);
+    if(!error.isEmpty()) {
+        const errorMessages = error.errors.map(e => e.msg);
+        return next(
+            new HttpError( errorMessages.join(' '), 422 )
+        );
+    };
+
     const { name, email, age, role, password } = req.body;
 
     //Password Validation for more security
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,10}$/;
     if (!passwordRegex.test(password)) {
         return next(
-            new HttpError('Password must contain at least one uppercase letter, one lowercase letter, one number, and be 8 to 10 characters long.', 402)
+            new HttpError('Password must contain at least one uppercase letter, one lowercase letter, one number, and be 8 to 10 characters long.', 400)
         )
     };
 
@@ -31,21 +40,35 @@ const registerUser = async (req, res, next) => {
 };
 
 const loginUser = async (req, res, next) => {
+    const error = validationResult(req);
+    if(!error.isEmpty()) {
+        const errorMessages = error.errors.map(e => e.msg);
+        return next(
+            new HttpError( errorMessages.join(' '), 422 )
+        );
+    };
+
     const { email, password } = req.body;
 
     try {
         const user = await User.findOne({ email });
+        const match = await bcrypt.compare(password.trim(), user.password);
 
-        if (!user || !(await bcrypt.compare(password.trim(), user.password))) {
-            console.log((await bcrypt.compare(password.trim(), user.password)))
+        if (!user) {
             return next(
-                new HttpError('Invalid credentials for requested user.', 402)
+                new HttpError('User does not exist.', 401)
+            )
+        }
+
+        if (!match) {
+            return next(
+                new HttpError('Invalid password for requested user.', 401)
             )
         }
 
         //Create a JWT token and add it to the tokens array
         const token = jwt.sign({ userId: user._id, email: user.email }, jwtSecretKey, { expiresIn: '3h' });
-        user.tokens = user.tokens.concat(token);
+        user.tokens = user.tokens.concat({ token });
         await user.save();
 
         res.status(201).json({ userId: user._id, email: user.email, token });
@@ -56,6 +79,14 @@ const loginUser = async (req, res, next) => {
 };
 
 const logoffUser = async (req, res, next) => {
+    const error = validationResult(req);
+    if(!error.isEmpty()) {
+        const errorMessages = error.errors.map(e => e.msg);
+        return next(
+            new HttpError( errorMessages.join(' '), 422 )
+        );
+    };
+    
     const { userId, tokenToRevoke } = req.body;
 
     try {
@@ -68,7 +99,7 @@ const logoffUser = async (req, res, next) => {
         }
 
         //Check if token match with user's and remove it
-        const tokenIndex = user.tokens.indexOf(tokenToRevoke);
+        const tokenIndex = user.tokens.findIndex(tokenObj => tokenObj.token === tokenToRevoke);
 
         if (tokenIndex === -1) {
             return next(

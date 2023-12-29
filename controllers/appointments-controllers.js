@@ -2,6 +2,8 @@ const Doctor = require('../models/doctor');
 const Appointment = require('../models/appointment');
 const HttpError = require('../models/http-error');
 const { validationResult } = require('express-validator');
+const User = require('../models/user');
+//const { default: isEmail } = require('validator/lib/isEmail');
 
 const createAppointment = async (req, res, next) => {
     const error = validationResult(req);
@@ -22,6 +24,7 @@ const createAppointment = async (req, res, next) => {
         }
 
         const createdAppointment = new Appointment({
+            //moment.js librería
             date: date.day + '/' + date.month + '/' + date.year + ' at ' + time.hour + ':' + time.minutes,
             status,
             doctor: {
@@ -38,7 +41,7 @@ const createAppointment = async (req, res, next) => {
 
         res.status(201).json({appointment: createdAppointment});
     }catch(err){
-        const error = new HttpError('Creating appointment failed, please try again.', 500);
+        const error = new HttpError('Creating appointment failed, please try again.', 400);
         return next(error);
     };
 };
@@ -73,7 +76,7 @@ const updateAppointmentById = async (req, res, next) => {
         res.status(200).json({ appointment: appointment });
 
     } catch (err) {
-        const error = new HttpError("Could not update the requested appointment.", 500);
+        const error = new HttpError("Could not update the requested appointment.", 400);
         return next(error);
     }
 };
@@ -86,7 +89,7 @@ const deleteAppointmentById = async (req, res, next) => {
 
         res.status(200).json({message: 'Deleted appointment.'});
     } catch(err){
-        const error = new HttpError('Could not delete appointment.', 500);
+        const error = new HttpError('Could not delete appointment.', 400);
         return next(error);
     };
 };
@@ -117,22 +120,17 @@ const showDoctorAppointments = async (req, res, next) => {
             res.status(200).json({message: 'No appointments found for requested doctor.'})
         }
 
-        res.status(200).json({doctorAppointments});
+        const { limit, skip } = req.pagination;
+        const paginatedDoctorsAppointments = doctorAppointments.slice(skip, skip + limit);
+
+        res.status(200).json({paginatedDoctorsAppointments});
     } catch(err){
-        const error = new HttpError("Could not find requested doctor's appointments.", 500);
+        const error = new HttpError("Could not find requested doctor's appointments.", 400);
         return next(error);
     };
 };
 
 const arrangeAppointment = async (req, res, next) => {
-    const error = validationResult(req);
-    if(!error.isEmpty()) {
-        const errorMessages = error.errors.map(e => e.msg);
-        return next(
-            new HttpError( errorMessages.join(' '), 422 )
-        );
-    };
-
     const appointmentId = req.params.id;
 
     try {
@@ -143,26 +141,20 @@ const arrangeAppointment = async (req, res, next) => {
         }
 
         appointment.status = 'taken';
+        appointment.takenBy.user = req.user;
+        appointment.takenBy.user.id = req.user._id;
 
         await appointment.save();
 
         res.status(200).json({ appointment: appointment });
 
     } catch (err) {
-        const error = new HttpError("Could not arrange appointment.", 500);
+        const error = new HttpError("Could not arrange appointment.", 400);
         return next(error);
     }
 };
 
 const disarrangeAppointment = async (req, res, next) => {
-    const error = validationResult(req);
-    if(!error.isEmpty()) {
-        const errorMessages = error.errors.map(e => e.msg);
-        return next(
-            new HttpError( errorMessages.join(' '), 422 )
-        );
-    };
-
     const appointmentId = req.params.id;
 
     try {
@@ -173,13 +165,121 @@ const disarrangeAppointment = async (req, res, next) => {
         }
 
         appointment.status = 'available';
+        
+
+        appointment.takenBy = {};
+        await Appointment.findOneAndUpdate(
+            { _id: appointmentId },
+            { $unset: { 'takenBy': 1 } }
+        );
+
+        const userId = req.user._id;
+        const userName = req.user.name;
+        const userEmail = req.user.email;
+        const userAge = req.user.age;
+
+        const isInArray = appointment.canceledBy.some(e => e.user && e.user.email === userEmail);
+
+        if ( !isInArray ) {
+
+            appointment.canceledBy.push({ user: {
+                name: userName, 
+                email: userEmail, 
+                age: userAge, 
+                id: userId,
+            } });
+
+        } else {
+            const userIndex = appointment.canceledBy.findIndex(item => item.user && item.user.email === userEmail);
+            appointment.canceledBy[userIndex].timesCanceled += 1;
+        }
 
         await appointment.save();
 
         res.status(200).json({ appointment: appointment });
 
     } catch (err) {
-        const error = new HttpError("Could not disarrange appointment.", 500);
+        const error = new HttpError("Could not disarrange appointment.", 400);
+        return next(error);
+    }
+};
+
+const showPatientsAppointment = async (req, res, next) => {
+    const userId = req.params.userId;
+
+    try {
+        const user = await User.findById(userId)
+
+        if ( !user ) {
+            return next(new HttpError('User not found.', 404))
+        }
+        
+        const appointment = await Appointment.find()
+
+        let userAppointments = [];
+
+        appointment.forEach(appointment => {
+            if ( userId == appointment.takenBy.user.id ) {
+                userAppointments.push(appointment);
+            } else {
+                userAppointments;
+            }
+        });
+
+        if ( userAppointments.length === 0) {
+            res.status(200).json({message: 'No appointments found for requested user.'})
+        }
+
+        const { limit, skip } = req.pagination;
+        const paginatedUserAppointments = userAppointments.slice(skip, skip + limit);
+
+        res.status(200).json({ paginatedUserAppointments });
+
+    } catch (err) {
+        const error = new HttpError("Could not match user's appointment.", 400);
+        return next(error);
+    }
+};
+
+const showPatientsCanceledAppointment = async (req, res, next) => {
+    const userId = req.params.userId;
+
+    try {
+        const user = await User.findById(userId);
+
+        if ( !user ) {
+            return next(new HttpError('User not found.', 404));
+        }
+
+        const appointment = await Appointment.find();
+
+        let userAppointments = [];
+
+        appointment.forEach(e => {
+            if ( e.canceledBy.length !== 0 ) {
+
+                e.canceledBy.forEach(e => { 
+                    if ( userId == e.user.id ) {
+                        userAppointments.push(e);
+                    } else {
+                        userAppointments;
+                    }
+                })
+
+            }
+        });
+
+        if ( userAppointments.length === 0) {
+            res.status(200).json({message: 'No appointments found for requested user.'})
+        }
+
+        const { limit, skip } = req.pagination;
+        const paginatedUserAppointments = userAppointments.slice(skip, skip + limit);
+
+        res.status(200).json({ paginatedUserAppointments });
+
+    } catch (err) {
+        const error = new HttpError("Could not match user's appointment.", 400);
         return next(error);
     }
 };
@@ -190,3 +290,5 @@ exports.deleteAppointmentById = deleteAppointmentById;
 exports.showDoctorAppointments = showDoctorAppointments;
 exports.arrangeAppointment = arrangeAppointment;
 exports.disarrangeAppointment = disarrangeAppointment;
+exports.showPatientsAppointment = showPatientsAppointment;
+exports.showPatientsCanceledAppointment = showPatientsCanceledAppointment;

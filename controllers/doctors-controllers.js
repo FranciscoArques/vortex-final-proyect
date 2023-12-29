@@ -6,19 +6,22 @@ const { validationResult } = require('express-validator');
 
 const showAllDoctorsData = async (req, res, next) => {
     try {
-        const doctors = await Doctor.find();
+        const { limit, skip } = req.pagination;
+        const doctors = await Doctor.find().skip(skip).limit(limit);
+
         res.status(200).json({doctors});
     } catch(err){
-        const error = new HttpError('Could not find all requested doctors information.', 500);
+        const error = new HttpError('Could not find all requested doctors information.', 400);
         return next(error);
     };
 }
 
 const getDoctorbyId = async (req, res, next) => {
     const doctorId = req.params.id;
+    const { limit, skip } = req.pagination;
 
     try {
-        const doctor = await Doctor.findById(doctorId);
+        const doctor = await Doctor.findById(doctorId).skip(skip).limit(limit);
 
         if(!doctor){
             return next(
@@ -28,7 +31,7 @@ const getDoctorbyId = async (req, res, next) => {
 
         res.status(200).json({doctor: doctor});
     } catch(err){
-        const error = new HttpError('Could not find the requested doctor information.', 500);
+        const error = new HttpError('Could not find the requested doctor information.', 400);
         return next(error);
     };
 }
@@ -70,7 +73,7 @@ const createDoctor = async (req, res, next) => {
 
         res.status(201).json({doctor: createdDoctor});
     }catch(err){
-        const error = new HttpError('Creating Doctor failed, please try again.', 500);
+        const error = new HttpError('Creating Doctor failed, please try again.', 400);
         return next(error);
     };
 };
@@ -114,7 +117,7 @@ const updateDoctorById = async (req, res, next) => {
                 try {
                     await Speciality.findOneAndDelete({ speciality: oldDoctor.speciality });
                 } catch (err) {
-                    const error = new HttpError("Could not delete old speciality with no doctors.", 500);
+                    const error = new HttpError("Could not delete old speciality with no doctors.", 400);
                     return next(error);
                 }
             };
@@ -152,14 +155,14 @@ const updateDoctorById = async (req, res, next) => {
             );
 
         } catch (err) {
-            const error = new HttpError("Could find doctor appointment.", 500);
+            const error = new HttpError("Could find doctor appointment.", 404);
             return next(error);
         }
 
         res.status(200).json({ doctor: doctor });
 
     } catch (err) {
-        const error = new HttpError("Could not update the requested doctor or the requested doctor's speciality.", 500);
+        const error = new HttpError("Could not update the requested doctor or the requested doctor's speciality.", 404);
         return next(error);
     }
 };

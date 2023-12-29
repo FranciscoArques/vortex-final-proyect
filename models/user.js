@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const HttpError = require('../models/http-error');
 const validator = require('validator');
-const bcrypt = require('bcryptjs');
 
 const userSchema = new Schema({
     name: { type: String, required: true, trim: true },
@@ -23,18 +22,7 @@ const userSchema = new Schema({
     age: { type: Number, required: true },
     role: { type: String, trim: true, lowercase: true, enum: ['admin', 'patient'], default: 'patient' },
     password: { type: String, required: true, trim: true },
-    tokens: [{ type: String }]
-});
-
-//Hash user's password
-userSchema.pre('save', async function (next) {
-    const user = this;
-
-    if (user.isModified('password')) {
-        user.password = await bcrypt.hash(user.password, 8);
-    }
-
-    next();
+    tokens: [{ token: { type: String, required: true } }]
 });
 
 module.exports = mongoose.model('User', userSchema);
