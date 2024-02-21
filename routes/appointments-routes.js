@@ -6,6 +6,12 @@ const roleMiddleware = require('../middleware/role-middleware');
 const paginationMiddleware = require('../middleware/pagination-middleware');
 const router = express.Router();
 
+//show all appointments
+router.get('/', paginationMiddleware.handlePagination, appointmentsControllers.ShowAllAppointments);
+
+//filter appointments
+router.get('/filter/:id', paginationMiddleware.handlePagination, appointmentsControllers.getAppointmentById);
+
 //show patient's appointment
 router.get('/patient/:userId', authMiddleware.authenticateUser, paginationMiddleware.handlePagination, appointmentsControllers.showPatientsAppointment);
 
@@ -13,7 +19,7 @@ router.get('/patient/:userId', authMiddleware.authenticateUser, paginationMiddle
 router.get('/canceled/:userId', authMiddleware.authenticateUser, paginationMiddleware.handlePagination, appointmentsControllers.showPatientsCanceledAppointment);
 
 //show doctor's appointment
-router.get('/:id', authMiddleware.authenticateUser, roleMiddleware.checkAdminRole, paginationMiddleware.handlePagination, appointmentsControllers.showDoctorAppointments);
+router.get('/doctor/:id', authMiddleware.authenticateUser, roleMiddleware.checkAdminRole, paginationMiddleware.handlePagination, appointmentsControllers.showDoctorAppointments);
 
 //create appointment
 router.post(
@@ -21,11 +27,11 @@ router.post(
     authMiddleware.authenticateUser,
     roleMiddleware.checkAdminRole,
     [
-        check('time.minutes').isIn(['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55']).withMessage('A reasonable minute must be added.'),
-        check('time.hour').isIn(['08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20']).withMessage('A reasonable hour must be added.'),
-        check('date.day').isIn(['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31']).withMessage('A reasonable day must be added.'),
-        check('date.month').isIn(['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']).withMessage('A reasonable month must be added.'),
-        check('date.year').isIn(['2023', '2024', '2025', '2026']).withMessage('A reasonable year must be added.'),
+        //check('time.minutes').isIn(['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55']).withMessage('A reasonable minute must be added.'),
+        //check('time.hour').isIn(['08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20']).withMessage('A reasonable hour must be added.'),
+        //check('date.day').isIn(['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31']).withMessage('A reasonable day must be added.'),
+        //check('date.month').isIn(['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']).withMessage('A reasonable month must be added.'),
+        //check('date.year').isIn(['2023', '2024', '2025', '2026']).withMessage('A reasonable year must be added.'),
         check('status').trim().toLowerCase().isIn(['taken','available']).withMessage('Only "taken" or "available" status accepted.'),
         check('doctorId').notEmpty().withMessage('A doctor id is required.').trim()
     ], 

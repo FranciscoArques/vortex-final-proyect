@@ -1,7 +1,13 @@
 const express = require('express');
 const { check } = require('express-validator');
 const usersControllers = require('../controllers/users-controllers');
+const authMiddleware = require('../middleware/auth-middleware');
+const roleMiddleware = require('../middleware/role-middleware');
+const paginationMiddleware = require('../middleware/pagination-middleware');
 const router = express.Router();
+
+//Show Users
+router.get('/', authMiddleware.authenticateUser, roleMiddleware.checkAdminRole, paginationMiddleware.handlePagination, usersControllers.ShowUsers);
 
 //Register user
 router.post(

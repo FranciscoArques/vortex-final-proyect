@@ -7,6 +7,18 @@ require('dotenv').config();
 
 const jwtSecretKey = process.env.JWT_SECRET_KEY || 'defaultSecretKey';
 
+const ShowUsers = async (req, res, next) => {
+    try {
+        const { limit, skip } = req.pagination;
+        const users = await User.find().skip(skip).limit(limit);
+
+        res.status(200).json({users});
+    } catch(err){
+        const error = new HttpError('Could not find all requested users information.', 400);
+        return next(error);
+    };
+}
+
 const registerUser = async (req, res, next) => {
     const error = validationResult(req);
     if(!error.isEmpty()) {
@@ -71,7 +83,7 @@ const loginUser = async (req, res, next) => {
         user.tokens = user.tokens.concat({ token });
         await user.save();
 
-        res.status(201).json({ userId: user._id, email: user.email, token });
+        res.status(201).json({ userId: user._id, name: user.name, role: user.role, email: user.email, token });
     } catch(err){
         const error = new HttpError('Log-in User failed, please try again.', 500);
         return next(error);
@@ -117,6 +129,7 @@ const logoffUser = async (req, res, next) => {
     }
 };
 
+exports.ShowUsers = ShowUsers;
 exports.registerUser = registerUser;
 exports.loginUser = loginUser;
 exports.logoffUser = logoffUser;

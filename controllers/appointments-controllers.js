@@ -5,6 +5,38 @@ const { validationResult } = require('express-validator');
 const User = require('../models/user');
 //const { default: isEmail } = require('validator/lib/isEmail');
 
+const ShowAllAppointments = async (req, res, next) => {
+    try {
+        const { limit, skip } = req.pagination;
+        const appointments = await Appointment.find().skip(skip).limit(limit);
+
+        res.status(200).json({appointments});
+    } catch(err){
+        const error = new HttpError('Could not find all requested appointments information.', 400);
+        return next(error);
+    };
+}
+
+const getAppointmentById = async (req, res, next) => {
+    const appointmentId = req.params.id;
+    const { limit, skip } = req.pagination;
+
+    try {
+        const appointment = await Appointment.findById(appointmentId).skip(skip).limit(limit);
+
+        if(!appointment){
+            return next(
+                new HttpError('Could not find a matching appointment for the provided id.', 404)
+            );
+        }
+
+        res.status(200).json({appointment: appointment});
+    } catch(err){
+        const error = new HttpError('Could not find the requested appointment information.', 400);
+        return next(error);
+    };
+}
+
 const createAppointment = async (req, res, next) => {
     const error = validationResult(req);
     if(!error.isEmpty()) {
@@ -25,7 +57,8 @@ const createAppointment = async (req, res, next) => {
 
         const createdAppointment = new Appointment({
             //moment.js librería
-            date: date.day + '/' + date.month + '/' + date.year + ' at ' + time.hour + ':' + time.minutes,
+            //date: date.day + '/' + date.month + '/' + date.year + ' at ' + time.hour + ':' + time.minutes,
+            date: date + ' at ' + time,
             status,
             doctor: {
                 id: doctorId,
@@ -55,7 +88,7 @@ const updateAppointmentById = async (req, res, next) => {
         );
     };
 
-    const { time, date, status, doctorId } = req.body;
+    const { date, status, doctorId } = req.body;
     const appointmentId = req.params.id;
 
     try {
@@ -66,7 +99,7 @@ const updateAppointmentById = async (req, res, next) => {
             return next(new HttpError('Doctor not found.', 404));
         }
 
-        appointment.date = (time !== undefined && date !== undefined) ? ( date.day + '/' + date.month + '/' + date.year + ' at ' + time.hour + ':' + time.minutes ) : appointment.date;
+        appointment.date = date !== undefined ? date : appointment.date;
         appointment.status = status !== undefined ? status : appointment.status;
         appointment.doctor.id = doctorId !== undefined ? appointment.doctor = doctor : appointment.doctor.id;
         appointment.__v += 1;
@@ -284,6 +317,8 @@ const showPatientsCanceledAppointment = async (req, res, next) => {
     }
 };
 
+exports.ShowAllAppointments = ShowAllAppointments;
+exports.getAppointmentById = getAppointmentById;
 exports.createAppointment = createAppointment;
 exports.updateAppointmentById = updateAppointmentById;
 exports.deleteAppointmentById = deleteAppointmentById;
