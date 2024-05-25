@@ -1,0 +1,537 @@
+{
+	"info": {
+		"_postman_id": "69993eaf-0bf5-4e70-a738-3e46ccd4af2f",
+		"name": "vortex-final-proyect",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "doctor-related",
+			"item": [
+				{
+					"name": "show-doctors",
+					"id": "6e265534-42d7-42a6-a092-7c6d8c635e03",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/doctors?page=1&limit=10",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"doctors"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "filter-doctor",
+					"id": "570d4746-1aea-4822-a126-2cd6c8af9cbd",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/doctors/658ec41645f8388b66c8af7b?page=1&limit=10",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"doctors",
+								"658ec41645f8388b66c8af7b"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create-doctor",
+					"id": "cf0e62f7-7cf3-4726-bdcb-1bf614a1a5a4",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NThjZWNlMGQ2YTRjYTQyNWFiYzE4MWYiLCJlbWFpbCI6ImFkbWluM0BtYWlsLmNvbSIsImlhdCI6MTcwMzczNTQwMSwiZXhwIjoxNzAzNzQ2MjAxfQ.vU1D4JOsQt5couofiL6xRKBAfH9F9hblSJ1c82POWS4",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"surname\": \"Arriña\",\r\n    \"name\": \"Sofía\",\r\n    \"speciality\": \"T\",\r\n    \"gender\": \"female\",\r\n    \"age\": 23\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{url}}/api/doctors"
+					},
+					"response": []
+				},
+				{
+					"name": "update-doctor",
+					"id": "11aaa58a-7504-4e8f-b613-944f620ef31c",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"surname\": \"Ludueña\",\r\n    \"name\": \"María\",\r\n    \"speciality\": \"A\",\r\n    \"gender\": \"female\",\r\n    \"age\": 40\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{url}}/api/doctors/658ec43c45f8388b66c8af82"
+					},
+					"response": []
+				}
+			],
+			"id": "c9bb0c58-1222-4075-9346-380a3daf463e"
+		},
+		{
+			"name": "speciality-related",
+			"item": [
+				{
+					"name": "show-specialities",
+					"id": "a63f5255-8cc1-4342-a99d-6761bc876852",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/api/specialities?page=1&limit=10",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"specialities"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "f352d6c3-8436-4b93-a96b-1872e46f1974"
+		},
+		{
+			"name": "appointment-related",
+			"item": [
+				{
+					"name": "filter-appointment-by-doctor",
+					"id": "69ad0e3e-fb84-44e7-affa-790853945d1b",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NThjZWNlMGQ2YTRjYTQyNWFiYzE4MWYiLCJlbWFpbCI6ImFkbWluM0BtYWlsLmNvbSIsImlhdCI6MTcwMzc2NTc2NywiZXhwIjoxNzAzNzc2NTY3fQ.rXl9fOs6SGP5H_03x6fXb1lBjb-BtKe4ynuDRf00y0M",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/api/appointments/658cf1488cf3b054319fbca6?page=1&limit=10",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"appointments",
+								"658cf1488cf3b054319fbca6"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "filter-appointment-by-user",
+					"id": "f975c95c-c074-42fb-9f9b-343e92414d01",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NThjZmVjMTkxMjI4MzE1MzlkOGUzNDgiLCJlbWFpbCI6InBhdGllbnRAbWFpbC5jb20iLCJpYXQiOjE3MDM3NjcwOTMsImV4cCI6MTcwMzc3Nzg5M30.220r6g5MaFu_OLlH2EI1j3wMzod5eiql0NpappNsXDQ",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/api/appointments/patient/658cfec19122831539d8e348?page=1&limit=10",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"appointments",
+								"patient",
+								"658cfec19122831539d8e348"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "filter-appointment-by-user-canceled",
+					"id": "c0c6df0c-5be9-4439-8b54-26e6c200380f",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NThjZmVjMTkxMjI4MzE1MzlkOGUzNDgiLCJlbWFpbCI6InBhdGllbnRAbWFpbC5jb20iLCJpYXQiOjE3MDM3NjcwOTMsImV4cCI6MTcwMzc3Nzg5M30.220r6g5MaFu_OLlH2EI1j3wMzod5eiql0NpappNsXDQ",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/api/appointments/canceled/658cfec19122831539d8e348?page=1&limit=10",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"appointments",
+								"canceled",
+								"658cfec19122831539d8e348"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create-appointment",
+					"id": "b122e38d-2a8c-4396-8c60-232aac15d776",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NThjZWNlMGQ2YTRjYTQyNWFiYzE4MWYiLCJlbWFpbCI6ImFkbWluM0BtYWlsLmNvbSIsImlhdCI6MTcwMzczNTQwMSwiZXhwIjoxNzAzNzQ2MjAxfQ.vU1D4JOsQt5couofiL6xRKBAfH9F9hblSJ1c82POWS4",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"time\":{\r\n      \"minutes\": \"10\",\r\n      \"hour\": \"16\" \r\n    },\r\n    \"date\":{\r\n        \"day\": \"05\",\r\n        \"month\": \"09\",\r\n        \"year\": \"2024\"\r\n    },\r\n    \"status\": \"available\",\r\n    \"doctorId\": \"658ec43c45f8388b66c8af82\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{url}}/api/appointments"
+					},
+					"response": []
+				},
+				{
+					"name": "update-appointment",
+					"id": "07eea437-7cd1-4f55-adb3-6211cb28b6a2",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"time\":{\r\n      \"minutes\": \"10\",\r\n      \"hour\": \"15\" \r\n    },\r\n    \"date\":{\r\n        \"day\": \"20\",\r\n        \"month\": \"10\",\r\n        \"year\": \"2024\"\r\n    },\r\n    \"status\": \"available\",\r\n    \"doctorId\": \"658ec41645f8388b66c8af7b\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{url}}/api/appointments/658ec5fa1340ebec0ddc0219"
+					},
+					"response": []
+				},
+				{
+					"name": "arrange-appointment",
+					"id": "0df24763-3a13-413a-9846-7b543f725782",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NThjZmVjMTkxMjI4MzE1MzlkOGUzNDgiLCJlbWFpbCI6InBhdGllbnRAbWFpbC5jb20iLCJpYXQiOjE3MDM3NTYwNDMsImV4cCI6MTcwMzc2Njg0M30.O-qC8OlYAu23gTVmOB-fJ9vSUH4RXrOuh9oR-Jonaqo",
+								"type": "text"
+							}
+						],
+						"url": "{{url}}/api/appointments/setTaken/658cfd19c76c7b14afd18799"
+					},
+					"response": []
+				},
+				{
+					"name": "disarrange-appointment",
+					"id": "8490fbf8-63c3-4362-8416-6f01d555ab50",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NThjZmVjMTkxMjI4MzE1MzlkOGUzNDgiLCJlbWFpbCI6InBhdGllbnRAbWFpbC5jb20iLCJpYXQiOjE3MDM3NTYwNDMsImV4cCI6MTcwMzc2Njg0M30.O-qC8OlYAu23gTVmOB-fJ9vSUH4RXrOuh9oR-Jonaqo",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{url}}/api/appointments/setAvailable/658ec5fa1340ebec0ddc0219"
+					},
+					"response": []
+				},
+				{
+					"name": "delete-appointment",
+					"id": "b5709da3-8f7b-4f97-9870-0f61b166f155",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "{{url}}/api/appointments/658ec6a71340ebec0ddc022c"
+					},
+					"response": []
+				}
+			],
+			"id": "6048db64-99d0-4ed5-8ebf-8f340fd78859"
+		},
+		{
+			"name": "user-related",
+			"item": [
+				{
+					"name": "register-user",
+					"id": "8d222fb0-4d60-4c95-8709-ccbaed9dd2c7",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Admin2\",\r\n    \"email\": \"admin2@mail.com\",\r\n    \"age\": 25,\r\n    \"role\": \"admin\",\r\n    \"password\": \"Yosoyfran1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{url}}/api/users/register"
+					},
+					"response": []
+				},
+				{
+					"name": "log-in-user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "845d3f65-8ab3-49d6-9f8a-cbe2440f8cf1",
+								"exec": [
+									"if (pm.response.code === 201) {\r",
+									"    pm.environment.set('authToken', pm.response.json().token)\r",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"id": "edaf2fa8-304c-470b-939b-441db553827a",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"admin@mail.com\",\r\n    \"password\": \"Yosoyfran1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{url}}/api/users/login"
+					},
+					"response": []
+				},
+				{
+					"name": "log-off-user",
+					"id": "e6a74122-335f-45c9-9f4c-af927ac37564",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userId\": \"658ec3b045f8388b66c8af73\",\r\n    \"tokenToRevoke\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NThlYzNiMDQ1ZjgzODhiNjZjOGFmNzMiLCJlbWFpbCI6ImFkbWluQG1haWwuY29tIiwiaWF0IjoxNzAzODU1MDc1LCJleHAiOjE3MDM4NjU4NzV9.tAMPeTkvbdBQyydixun0koL7aRXdggpfQiKliP6Rtdc\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{url}}/api/users/logoff"
+					},
+					"response": []
+				}
+			],
+			"id": "a48f9307-3b96-4860-9c22-7e13579907ff"
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": {
+			"token": "{{authToken}}"
+		}
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "352be340-efb5-45e7-9863-2ced24c10b87",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "d6a95563-b019-4936-a2e3-e58bcc2ddc80",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
